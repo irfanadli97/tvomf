@@ -1,0 +1,17 @@
+{
+	"required": true,
+	"package": "io.github.irfanadli97.tvomf.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"GuiRenderStateMixin",
+		"GuiRendererMixin",
+		"HudMixin",
+		"PictureInPictureRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

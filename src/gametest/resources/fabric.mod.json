@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "tvomf-test",
+	"version": "1.0.0",
+	"name": "TVOMF visual tests",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"io.github.irfanadli97.tvomf.test.HudVisualTest"
+		]
+	},
+	"depends": {
+		"tvomf": "*"
+	}
+}

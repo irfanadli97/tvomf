@@ -1,0 +1,49 @@
+{
+	"schemaVersion": 1,
+	"id": "tvomf",
+	"version": "${version}",
+	"name": "There's a Visor On My Face",
+	"description": "Your HUD sways, bobs and curves as if it were drawn on a helmet visor. Based on GD656MotionHUD by Minecraft_GD656 (Forge 1.20.1, MIT), whose HUD sway this mod ports to Fabric and builds on. Not affiliated with or supported by the original author.",
+	"authors": [
+		"irfanadli97",
+		"Minecraft_GD656 (original GD656MotionHUD)"
+	],
+	"contact": {
+		"homepage": "https://github.com/irfanadli97/tvomf",
+		"sources": "https://github.com/irfanadli97/tvomf",
+		"issues": "https://github.com/irfanadli97/tvomf/issues"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"io.github.irfanadli97.tvomf.MotionHudClient"
+		],
+		"modmenu": [
+			"io.github.irfanadli97.tvomf.compat.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		{
+			"config": "tvomf.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"cloth-config": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"Original mod: GD656MotionHUD": "https://modrinth.com/mod/gd656motionhud"
+			}
+		}
+	}
+}
