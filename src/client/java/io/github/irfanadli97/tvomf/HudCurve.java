@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -269,7 +269,9 @@ public final class HudCurve {
 		private static final int NORMAL_Y = 14;
 		private static final int NORMAL_Z = 15;
 		private static final int LINE_WIDTH = 16;
-		private static final int VALUES = 17;
+		private static final int UV3_U = 17;
+		private static final int UV3_V = 18;
+		private static final int VALUES = 19;
 
 		private final float[][] corners = new float[VALUES][4];
 		private final float[] x = corners[X];
@@ -279,6 +281,7 @@ public final class HudCurve {
 		private boolean hasColor;
 		private boolean hasUv1;
 		private boolean hasUv2;
+		private boolean hasUv3;
 		private boolean hasNormal;
 		private boolean hasLineWidth;
 
@@ -290,12 +293,13 @@ public final class HudCurve {
 			hasColor = false;
 			hasUv1 = false;
 			hasUv2 = false;
+			hasUv3 = false;
 			hasNormal = false;
 			hasLineWidth = false;
 		}
 
 		boolean usesExtraData() {
-			return hasUv1 || hasUv2 || hasNormal || hasLineWidth;
+			return hasUv1 || hasUv2 || hasUv3 || hasNormal || hasLineWidth;
 		}
 
 		void end() {
@@ -371,6 +375,15 @@ public final class HudCurve {
 			corners[UV2_U][count - 1] = vu;
 			corners[UV2_V][count - 1] = vv;
 			hasUv2 = true;
+			return this;
+		}
+
+		// Added to the vertex formats in Minecraft 26.3.
+		@Override
+		public VertexConsumer setUv3(float vu, float vv) {
+			corners[UV3_U][count - 1] = vu;
+			corners[UV3_V][count - 1] = vv;
+			hasUv3 = true;
 			return this;
 		}
 
@@ -461,6 +474,10 @@ public final class HudCurve {
 
 			if (hasUv2) {
 				delegate.setUv2(Math.round(blended[UV2_U]), Math.round(blended[UV2_V]));
+			}
+
+			if (hasUv3) {
+				delegate.setUv3(blended[UV3_U], blended[UV3_V]);
 			}
 
 			if (hasNormal) {

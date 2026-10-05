@@ -17,7 +17,7 @@ public abstract class GameRendererCaptureMixin {
 	}
 
 	@Inject(method = "render", at = @At("RETURN"))
-	private void tvomftest$afterFrame(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
+	private void tvomftest$afterFrame(CallbackInfo ci) {
 		FrameCapture.afterFrame((GameRenderer) (Object) this);
 	}
 }

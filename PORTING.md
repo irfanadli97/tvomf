@@ -115,6 +115,22 @@ and with the curve on and off. Look for:
 
 `make-media.ps1` reshoots the stills and clips for the README once the port is right.
 
+## Port log
+
+### 26.2 to 26.3 (branch `mc/26.3`)
+
+Every hook still took unchanged. Two compile fixes and one test fix:
+
+- `PrimitiveTopology` moved from `com.mojang.blaze3d` to `com.mojang.renderpearl.api.pipeline`
+  (26.3 moved much of the low-level rendering API into a `renderpearl` package).
+- `VertexConsumer` gained `setUv3(float, float)`. `HudCurve.Curved` stores and blends it like the
+  other values.
+- Test only: `GameRenderer.render` lost its parameters, so the frame-capture hook's handler had
+  to drop them too. A handler whose parameters do not match the target fails the mixin outright;
+  in the mod itself that would switch the feature off, in the test mod it stops the client.
+
+Checked with the visual test, mod alone. Not yet checked with other mods on 26.3.
+
 ## Releasing
 
 1. Merge or tag on the version's branch; CI (`.github/workflows/build.yml`) builds the jar on
