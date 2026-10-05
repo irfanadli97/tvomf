@@ -181,4 +181,10 @@ MIT, same as the mod it is based on. The sway model, its three settings and the
 `config list/edit/reset` commands come from GD656MotionHUD by Minecraft_GD656; the rest was written
 for this project. Details are in [CREDITS.md](CREDITS.md) and [LICENSE](LICENSE).
 
+### AI disclosure
+
+The code in this repository was written with an AI assistant (Anthropic's Claude), directed,
+play-tested and tuned by irfanadli97. The icon was generated with Google Flow. The clips and
+screenshots are unedited captures from the game.
+
 Bugs in TVOMF are TVOMF's fault. Please report them here, not to the original author.
