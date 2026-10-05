@@ -46,3 +46,6 @@ curve-*.png
 
 # full-size clips are uploaded to the page by hand; the WebP versions are committed
 docs/media/*.mp4
+
+# other mods' jars for compatibility testing
+rigs/
