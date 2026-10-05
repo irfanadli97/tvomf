@@ -1,3 +1,5 @@
+<img src="src/main/resources/assets/tvomf/icon.png" alt="TVOMF icon" width="128" align="right">
+
 # There's a Visor On My Face
 
 **TVOMF** for short. A client-side Fabric mod for Minecraft 26.2.
@@ -39,6 +41,20 @@ judge you.
 
 Needs [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api).
 Drop the jar in your `mods` folder. It is client-side only and works on any server.
+
+## Recommended alongside
+
+A curved visor pulls things away from the screen edges, so you will probably want to move a few
+of them back. TVOMF can offset each HUD element by itself, but a dedicated mod does it with a
+nicer screen:
+
+- **[Raised](https://modrinth.com/mod/raised)** (recommended): moves the hotbar, chat, boss bar,
+  scoreboard, effects and more, and keeps the chat clickable where you put it. Its offsets and
+  TVOMF's add together, so pick one mod per element.
+- **[BedrockIfy](https://modrinth.com/mod/bedrockify)**: its screen safe area pushes the whole HUD
+  in from the edges, and its paper doll rides the visor too.
+
+Both are optional, and both have been run together with TVOMF.
 
 ## Settings screen
 
