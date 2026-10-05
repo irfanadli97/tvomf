@@ -43,3 +43,6 @@ replay_*.log
 
 old-builds/
 curve-*.png
+
+# full-size clips are uploaded to the page by hand; the WebP versions are committed
+docs/media/*.mp4

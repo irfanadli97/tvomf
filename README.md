@@ -13,6 +13,19 @@ your face, and the visor moves when you do.
 > MIT). TVOMF began as a Fabric port of it and then kept going. It is unofficial and not supported
 > by the original author; see [CREDITS.md](CREDITS.md) for exactly what is theirs and what is new.
 
+## See it move
+
+Just this mod, on the vanilla HUD. Look right, snap left, jump, then sprint:
+
+![The vanilla HUD swaying, bobbing and curving](docs/media/solo_clip.webp)
+
+The same five seconds with about fifty other mods loaded, including a minimap, block tooltips and
+a paper doll, all riding the visor:
+
+![A heavily modded HUD swaying, bobbing and curving](docs/media/full_clip.webp)
+
+Both clips use the default settings.
+
 ## What the visor does
 
 - **It sways.** Turn your head and the HUD lags behind for a moment, then catches up. This is the
@@ -29,6 +42,19 @@ your face, and the visor moves when you do.
 
 Everything is a toggle or a slider. If you only want the sway, turn the rest off and nobody will
 judge you.
+
+## Stills
+
+Motion is the point, so stills undersell it, but here is the curve standing still.
+
+| | Just this mod | With a full mod set |
+|---|---|---|
+| Curve, default strength | ![](docs/media/solo_1_visor_sphere.png) | ![](docs/media/full_1_visor_sphere.png) |
+| Cylinder shape | ![](docs/media/solo_2_visor_cylinder.png) | ![](docs/media/full_2_visor_cylinder.png) |
+| Curve turned up to 70 | ![](docs/media/solo_3_visor_sphere_strong.png) | ![](docs/media/full_3_visor_sphere_strong.png) |
+| Curve off, for comparison | ![](docs/media/solo_4_flat_for_comparison.png) | ![](docs/media/full_4_flat_for_comparison.png) |
+| Mid-turn | ![](docs/media/solo_5_mid_turn.png) | ![](docs/media/full_5_mid_turn.png) |
+| Sprinting | ![](docs/media/solo_6_sprinting.png) | ![](docs/media/full_6_sprinting.png) |
 
 ## What it leaves alone
 
@@ -132,6 +158,13 @@ The jar is written to `build/libs`.
 
 To include another mod's HUD in the screenshots, copy its jar into `build/run/clientGameTest/mods`
 first.
+
+## Page media
+
+`make-media.ps1 -ModSet solo` (or `full`) shoots the stills and the five second clip in
+`docs/media` from a scripted run in the test client: 1600x900, default settings, the same camera
+path every time. It needs ffmpeg on the PATH. For `full`, put the other mods' jars in
+`build/run/clientGameTest/mods-full`.
 
 ## Credits and licence
 
