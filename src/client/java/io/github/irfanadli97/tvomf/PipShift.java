@@ -35,10 +35,13 @@ public final class PipShift {
 	}
 
 	/**
-	 * Called at the start of each frame's HUD. Adding and then subtracting floats does not always
-	 * land back on exactly zero, and without this the leftovers would build up over hours of play.
+	 * Called at the start of each frame's HUD, by which time the models recorded for the previous
+	 * frame have been placed. Also zeroes the running shift: adding and then subtracting floats
+	 * does not always land back on exactly zero, and the leftovers would build up over hours.
 	 */
 	public static void startFrame() {
+		SHIFTS.clear();
+		pending = null;
 		currentX = 0;
 		currentY = 0;
 	}
@@ -48,12 +51,6 @@ public final class PipShift {
 		if ((Math.abs(currentX) > 1.0e-4f || Math.abs(currentY) > 1.0e-4f) && state.pose() == PictureInPictureRenderState.IDENTITY_POSE) {
 			SHIFTS.put(state, new float[] {currentX, currentY});
 		}
-	}
-
-	/** Called when the GUI's recorded state is thrown away at the end of a frame. */
-	public static void reset() {
-		SHIFTS.clear();
-		pending = null;
 	}
 
 	/** Brackets the step in which {@code state}'s texture is placed on the GUI. */

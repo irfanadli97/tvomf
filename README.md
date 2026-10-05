@@ -155,7 +155,11 @@ Positive x is right, positive y is down.
 gradlew build
 ```
 
-The jar is written to `build/libs`.
+The jar is written to `build/libs`. Moving to another Minecraft version? Start with
+[PORTING.md](PORTING.md).
+
+On a game version the mod was not built for, any part that can no longer hook into the game
+switches itself off and says so once in chat, instead of stopping the game from starting.
 
 ## Visual test
 

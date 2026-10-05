@@ -1,6 +1,7 @@
 {
-	"required": true,
+	"required": false,
 	"package": "io.github.irfanadli97.tvomf.mixin",
+	"plugin": "io.github.irfanadli97.tvomf.HookStatus",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"GuiRenderStateMixin",
@@ -9,7 +10,7 @@
 		"PictureInPictureRendererMixin"
 	],
 	"injectors": {
-		"defaultRequire": 1
+		"defaultRequire": 0
 	},
 	"overwrites": {
 		"requireAnnotations": true

@@ -21,9 +21,4 @@ public abstract class GuiRenderStateMixin {
 	private BlitRenderState tvomf$shiftModel(BlitRenderState blit) {
 		return PipShift.shift(blit);
 	}
-
-	@Inject(method = "reset", at = @At("HEAD"))
-	private void tvomf$reset(CallbackInfo ci) {
-		PipShift.reset();
-	}
 }
