@@ -29,6 +29,7 @@ import net.minecraft.util.Mth;
  */
 public class MediaShoot implements FabricClientGameTest {
 	static final String REQUEST = "media_request.txt";
+	private static boolean configured;
 	private static final int WIDTH = 1600;
 	private static final int HEIGHT = 900;
 	private static final double CLIP_SECONDS = 5.0;
@@ -49,7 +50,11 @@ public class MediaShoot implements FabricClientGameTest {
 		Path out;
 
 		try {
-			set = Files.readString(gameDir.resolve(REQUEST)).trim();
+			// First line: the name of the set. Second line, optional: "configured" to shoot with
+			// the settings in config/tvomf.json instead of the defaults.
+			List<String> request = Files.readAllLines(gameDir.resolve(REQUEST));
+			set = request.get(0).trim();
+			configured = request.size() > 1 && request.get(1).trim().equals("configured");
 			out = gameDir.resolve("media").resolve(set);
 			Files.createDirectories(out);
 		} catch (IOException e) {
@@ -117,18 +122,34 @@ public class MediaShoot implements FabricClientGameTest {
 			// Long enough for toasts and first-run chat lines from other mods to go away.
 			context.waitTicks(320);
 
-			still(context, set + "_1_visor_sphere", config -> {
+			still(context, set + "_1_as_configured", config -> {
 			});
-			still(context, set + "_2_visor_cylinder", config -> config.curveShape = MotionHudConfig.SHAPE_CYLINDER);
-			still(context, set + "_3_visor_sphere_strong", config -> config.curveStrength = 70);
+			still(context, set + "_2_sphere_strong", config -> {
+				config.curveShape = MotionHudConfig.SHAPE_SPHERE;
+				config.curveStrength = 70;
+			});
+			still(context, set + "_3_cylinder_strong", config -> {
+				config.curveShape = MotionHudConfig.SHAPE_CYLINDER;
+				config.curveStrength = 70;
+			});
 			still(context, set + "_4_flat_for_comparison", config -> config.curveEnabled = false);
 
-			clip(context, out, baseYaw);
+			walkClip(context, out, baseYaw);
+			context.waitTicks(40);
+			flickClip(context, out, baseYaw);
 			write(gameDir.resolve("media_done.txt"), List.of(set));
 		}
 	}
 
 	/** The mod's default settings, so the pictures show what a new install looks like. */
+	private static void baseline() {
+		if (configured) {
+			MotionHudConfig.load();
+		} else {
+			defaults(MotionHudConfig.get());
+		}
+	}
+
 	private static void defaults(MotionHudConfig config) {
 		config.resetSway();
 		config.swayEnabled = true;
@@ -142,17 +163,16 @@ public class MediaShoot implements FabricClientGameTest {
 
 	private static void still(ClientGameTestContext context, String name, Consumer<MotionHudConfig> change) {
 		context.runOnClient(minecraft -> {
-			MotionHudConfig config = MotionHudConfig.get();
-			defaults(config);
-			change.accept(config);
+			baseline();
+			change.accept(MotionHudConfig.get());
 			HudSway.setTestOffset(Float.NaN, Float.NaN);
 		});
 		context.waitTicks(20);
 		context.takeScreenshot(name);
 	}
 
-	private static void clip(ClientGameTestContext context, Path out, float baseYaw) {
-		context.runOnClient(minecraft -> defaults(MotionHudConfig.get()));
+	private static void walkClip(ClientGameTestContext context, Path out, float baseYaw) {
+		context.runOnClient(minecraft -> baseline());
 		context.waitTicks(20);
 
 		context.runOnClient(minecraft -> FrameCapture.start(out.resolve("clip.raw"), out.resolve("clip.meta"), CLIP_SECONDS, CLIP_FPS,
@@ -185,6 +205,40 @@ public class MediaShoot implements FabricClientGameTest {
 
 		context.getInput().releaseKey(options -> options.keySprint);
 		context.getInput().releaseKey(options -> options.keyUp);
+	}
+
+	/** Standing still and flicking the view hard from side to side: nothing but the sway. */
+	private static void flickClip(ClientGameTestContext context, Path out, float walkYaw) {
+		context.runOnClient(minecraft -> baseline());
+		// The walk ended somewhere else, so find an open view again.
+		float baseYaw = context.computeOnClient(MediaShoot::clearestYaw);
+		context.runOnClient(minecraft -> {
+			minecraft.player.setYRot(baseYaw);
+			minecraft.player.setXRot(9.0f);
+		});
+		context.waitTicks(30);
+
+		context.runOnClient(minecraft -> FrameCapture.start(out.resolve("flick.raw"), out.resolve("flick.meta"), CLIP_SECONDS, CLIP_FPS,
+				time -> new float[] {baseYaw + flick(time), 9.0f}));
+
+		while (!FrameCapture.finished()) {
+			context.waitTick();
+		}
+	}
+
+	private static final double[] FLICK_TIMES = {0.4, 0.9, 1.4, 1.9, 2.5, 2.8, 3.1, 3.4, 4.0};
+	private static final float[] FLICK_ANGLES = {50, -50, 50, -50, 30, -30, 30, -30, 0};
+	/** Seconds one flick takes; about as fast as a wrist does it. */
+	private static final double FLICK_SECONDS = 0.1;
+
+	private static float flick(double time) {
+		float angle = 0;
+
+		for (int i = 0; i < FLICK_TIMES.length; i++) {
+			angle = Mth.lerp(ease(time, FLICK_TIMES[i], FLICK_TIMES[i] + FLICK_SECONDS), angle, FLICK_ANGLES[i]);
+		}
+
+		return angle;
 	}
 
 	/** The direction with the most open space ahead, so the camera is not staring at a tree. */

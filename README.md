@@ -15,16 +15,24 @@ your face, and the visor moves when you do.
 
 ## See it move
 
-Just this mod, on the vanilla HUD. Look right, snap left, jump, then sprint:
+Just the sway: standing still and flicking the mouse hard from side to side.
+
+![The HUD lagging behind fast mouse flicks](docs/media/solo_flick.webp)
+
+Everything at once on the vanilla HUD. Look right, snap left, jump, then sprint:
 
 ![The vanilla HUD swaying, bobbing and curving](docs/media/solo_clip.webp)
 
-The same five seconds with about fifty other mods loaded, including a minimap, block tooltips and
-a paper doll, all riding the visor:
+The same two takes with about fifty other mods loaded, including a minimap, block tooltips and a
+paper doll, all riding the visor:
+
+![A heavily modded HUD lagging behind fast mouse flicks](docs/media/full_flick.webp)
 
 ![A heavily modded HUD swaying, bobbing and curving](docs/media/full_clip.webp)
 
-Both clips use the default settings.
+These were shot with the author's own settings, not the defaults: a stronger sway (`maxOffset`
+44, `damping` 0.37, `sensitivity` 0.25, `motionSensitivity` 28) and a gentler curve (cylinder,
+strength 9, rising to 18 with a 2.5% zoom-out while sprinting; bob 2 and 3.5).
 
 ## What the visor does
 
@@ -49,9 +57,9 @@ Motion is the point, so stills undersell it, but here is the curve standing stil
 
 | | Just this mod | With a full mod set |
 |---|---|---|
-| Curve, default strength | ![](docs/media/solo_1_visor_sphere.png) | ![](docs/media/full_1_visor_sphere.png) |
-| Cylinder shape | ![](docs/media/solo_2_visor_cylinder.png) | ![](docs/media/full_2_visor_cylinder.png) |
-| Curve turned up to 70 | ![](docs/media/solo_3_visor_sphere_strong.png) | ![](docs/media/full_3_visor_sphere_strong.png) |
+| Author's settings (cylinder, strength 9) | ![](docs/media/solo_1_as_configured.png) | ![](docs/media/full_1_as_configured.png) |
+| Sphere, turned up to 70 | ![](docs/media/solo_2_sphere_strong.png) | ![](docs/media/full_2_sphere_strong.png) |
+| Cylinder, turned up to 70 | ![](docs/media/solo_3_cylinder_strong.png) | ![](docs/media/full_3_cylinder_strong.png) |
 | Curve off, for comparison | ![](docs/media/solo_4_flat_for_comparison.png) | ![](docs/media/full_4_flat_for_comparison.png) |
 | Mid-turn | ![](docs/media/solo_5_mid_turn.png) | ![](docs/media/full_5_mid_turn.png) |
 | Sprinting | ![](docs/media/solo_6_sprinting.png) | ![](docs/media/full_6_sprinting.png) |
@@ -161,9 +169,10 @@ first.
 
 ## Page media
 
-`make-media.ps1 -ModSet solo` (or `full`) shoots the stills and the five second clip in
-`docs/media` from a scripted run in the test client: 1600x900, default settings, the same camera
-path every time. It needs ffmpeg on the PATH. For `full`, put the other mods' jars in
+`make-media.ps1 -ModSet solo` (or `full`) shoots the stills and the two five second clips in
+`docs/media` from a scripted run in the test client: 1600x900, the same camera path every time.
+Add `-SettingsFile path\to\tvomf.json` to shoot with your own settings instead of the defaults.
+It needs ffmpeg on the PATH. For `full`, put the other mods' jars in
 `build/run/clientGameTest/mods-full`.
 
 ## Credits and licence
