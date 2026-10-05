@@ -12,7 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.impl.client.rendering.hud.HudElementRegistryImpl;
 import net.fabricmc.fabric.impl.client.rendering.hud.HudLayer;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.Identifier;
 import org.joml.Matrix3x2fStack;
 
@@ -29,7 +29,7 @@ public final class HudElements {
 			VanillaHudElements.HOTBAR, VanillaHudElements.ARMOR_BAR, VanillaHudElements.HEALTH_BAR,
 			VanillaHudElements.FOOD_BAR, VanillaHudElements.AIR_BAR, VanillaHudElements.MOUNT_HEALTH,
 			VanillaHudElements.INFO_BAR, VanillaHudElements.EXPERIENCE_LEVEL, VanillaHudElements.HELD_ITEM_TOOLTIP,
-			VanillaHudElements.SPECTATOR_TOOLTIP, VanillaHudElements.MOB_EFFECTS, VanillaHudElements.BOSS_BAR,
+			VanillaHudElements.SPECTATOR_TOOLTIP, VanillaHudElements.STATUS_EFFECTS, VanillaHudElements.BOSS_BAR,
 			VanillaHudElements.SLEEP, VanillaHudElements.DEMO_TIMER, VanillaHudElements.SCOREBOARD,
 			VanillaHudElements.OVERLAY_MESSAGE, VanillaHudElements.TITLE_AND_SUBTITLE, VanillaHudElements.CHAT,
 			VanillaHudElements.PLAYER_LIST, VanillaHudElements.SUBTITLES);
@@ -98,7 +98,7 @@ public final class HudElements {
 
 	private record Wrapper(Identifier id, HudElement original) implements HudElement {
 		@Override
-		public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+		public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
 			MotionHudConfig config = MotionHudConfig.get();
 			float x = 0;
 			float y = 0;
@@ -117,7 +117,7 @@ public final class HudElements {
 			}
 
 			if (x == 0 && y == 0) {
-				original.extractRenderState(graphics, deltaTracker);
+				original.render(graphics, deltaTracker);
 				return;
 			}
 
@@ -128,7 +128,7 @@ public final class HudElements {
 
 			try {
 				pose.translate(x, y);
-				original.extractRenderState(graphics, deltaTracker);
+				original.render(graphics, deltaTracker);
 			} finally {
 				pose.popMatrix();
 				PipShift.add(-x, -y);

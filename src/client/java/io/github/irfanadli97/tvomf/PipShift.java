@@ -4,8 +4,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.renderer.state.gui.BlitRenderState;
-import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.client.gui.render.state.BlitRenderState;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.joml.Matrix3x2f;
 import org.jspecify.annotations.Nullable;
 

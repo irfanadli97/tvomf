@@ -7,7 +7,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.ClientAvatarState;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.Nullable;
@@ -96,7 +96,7 @@ public final class HudSway {
 			return;
 		}
 
-		Camera camera = minecraft.gameRenderer.mainCamera();
+		Camera camera = minecraft.gameRenderer.getMainCamera();
 		float yaw = camera.yRot();
 		float pitch = camera.xRot();
 		double height = camera.position().y;
@@ -226,7 +226,7 @@ public final class HudSway {
 	}
 
 	/** Runs {@code draw} with this frame's sway applied to everything it draws. */
-	public static void applyTo(GuiGraphicsExtractor graphics, Runnable draw) {
+	public static void applyTo(GuiGraphics graphics, Runnable draw) {
 		if (appliedX == 0 && appliedY == 0) {
 			draw.run();
 			return;

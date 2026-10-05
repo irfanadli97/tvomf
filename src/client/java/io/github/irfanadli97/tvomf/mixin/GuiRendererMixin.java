@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.GuiRenderer;
-import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import io.github.irfanadli97.tvomf.HookStatus;
 import io.github.irfanadli97.tvomf.HudCurve;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +31,7 @@ public abstract class GuiRendererMixin {
 	// Every GUI element, including text glyphs and item icons, is turned into vertices here.
 	@WrapOperation(
 			method = "addElementToMesh",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;buildVertices(Lcom/mojang/blaze3d/vertex/VertexConsumer;)V")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;buildVertices(Lcom/mojang/blaze3d/vertex/VertexConsumer;)V")
 	)
 	private void tvomf$curve(GuiElementRenderState element, VertexConsumer consumer, Operation<Void> original) {
 		HookStatus.curveRan = true;

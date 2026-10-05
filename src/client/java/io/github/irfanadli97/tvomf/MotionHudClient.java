@@ -39,8 +39,8 @@ public class MotionHudClient implements ClientModInitializer {
 		reportedMissing = true;
 
 		for (String feature : HookStatus.missingFeatures()) {
-			minecraft.player.sendSystemMessage(Component.literal("[" + MOD_ID + "] Not available on this game version: " + feature)
-					.withStyle(ChatFormatting.YELLOW));
+			minecraft.player.displayClientMessage(Component.literal("[" + MOD_ID + "] Not available on this game version: " + feature)
+					.withStyle(ChatFormatting.YELLOW), false);
 		}
 	}
 }

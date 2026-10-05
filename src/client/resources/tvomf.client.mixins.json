@@ -2,7 +2,7 @@
 	"required": false,
 	"package": "io.github.irfanadli97.tvomf.mixin",
 	"plugin": "io.github.irfanadli97.tvomf.HookStatus",
-	"compatibilityLevel": "JAVA_25",
+	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"GuiRenderStateMixin",
 		"GuiRendererMixin",

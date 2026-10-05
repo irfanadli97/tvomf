@@ -4,12 +4,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
@@ -66,7 +66,7 @@ public final class HudCurve {
 	public static void beginFrame() {
 		Minecraft minecraft = Minecraft.getInstance();
 		MotionHudConfig config = MotionHudConfig.get();
-		boolean wanted = minecraft.player != null && minecraft.gui.screen() == null;
+		boolean wanted = minecraft.player != null && minecraft.screen == null;
 
 		long now = System.nanoTime();
 		float elapsedMs = lastFrameNanos == 0 ? FADE_MS : (now - lastFrameNanos) / 1.0e6f;
@@ -142,7 +142,7 @@ public final class HudCurve {
 
 	/** Builds the element's vertices into {@code consumer}, bent. */
 	public static void build(GuiElementRenderState element, VertexConsumer consumer, Consumer<VertexConsumer> buildVertices) {
-		CURVED.begin(consumer, element.pipeline().getPrimitiveTopology() == PrimitiveTopology.QUADS);
+		CURVED.begin(consumer, element.pipeline().getVertexFormatMode() == VertexFormat.Mode.QUADS);
 
 		try {
 			buildVertices.accept(CURVED);

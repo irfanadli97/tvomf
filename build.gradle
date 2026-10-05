@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'fabric-loom' version "${loom_version}"
 }
 
 repositories {
@@ -40,13 +40,15 @@ fabricApi {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	// 1.21.x is obfuscated; the code is written against Mojang's own names.
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Optional at runtime: the settings screen needs both, the rest of the mod needs neither.
-	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }
-	compileOnly("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") { transitive = false }
+	modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }
+	modCompileOnly("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") { transitive = false }
 }
 
 processResources {
@@ -59,12 +61,12 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = 21
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

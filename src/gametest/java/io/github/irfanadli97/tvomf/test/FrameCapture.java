@@ -132,7 +132,7 @@ public final class FrameCapture {
 		framesTaken = wanted;
 		pending++;
 
-		Screenshot.takeScreenshot(gameRenderer.mainRenderTarget(), image -> {
+		Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget(), image -> {
 			try (image) {
 				width = image.getWidth();
 				height = image.getHeight();

@@ -115,6 +115,40 @@ and with the curve on and off. Look for:
 
 `make-media.ps1` reshoots the stills and clips for the README once the port is right.
 
+## Port log
+
+### 26.2 back to 1.21.11 (branch `mc/1.21.11`)
+
+1.21.11 already draws the GUI the way 26.2 does (recorded elements, a GUI mesh, picture-in-picture
+models), so every feature carried over. The work was build setup and names:
+
+- **Build:** 1.21.x is obfuscated. The plugin is `fabric-loom` (the remapping one) instead of
+  `net.fabricmc.fabric-loom`, with `mappings loom.officialMojangMappings()`, and mod
+  dependencies become `modImplementation` and `modCompileOnly`. Java 21 instead of 25, in
+  `build.gradle`, `fabric.mod.json` and both mixin configs.
+- **Renames (26.2 name, then 1.21.11 name):**
+  - `Hud` is `Gui`; `extractRenderState` is `render`; `extractDeferredSubtitles` is
+    `renderDeferredSubtitles`; `GuiGraphicsExtractor` is `GuiGraphics`.
+  - Package `net.minecraft.client.renderer.state.gui` is `net.minecraft.client.gui.render.state`.
+  - `GuiRenderState.addPicturesInPictureState` and `addBlitToCurrentLayer` are
+    `submitPicturesInPictureState` and `submitBlitToCurrentLayer`.
+  - `PictureInPictureRenderer.prepare` has no `FeatureRenderDispatcher` parameter.
+  - `RenderPipeline.getPrimitiveTopology()` and `PrimitiveTopology.QUADS` are
+    `getVertexFormatMode()` and `VertexFormat.Mode.QUADS`.
+  - `GameRenderer.mainCamera()` is `getMainCamera()`; `Minecraft.gui.screen()` is the field
+    `Minecraft.screen`; `LocalPlayer.sendSystemMessage` is `displayClientMessage(text, false)`.
+  - Fabric API: `HudElement.extractRenderState` is `render`; `ClientCommands` is
+    `ClientCommandManager`; `VanillaHudElements.MOB_EFFECTS` is `STATUS_EFFECTS`.
+  - Test only: there is no `GameRenderer.extract`; both capture hooks go on `render`.
+- **Trap:** a class name inside an `@At(target = "Lnet/minecraft/...;")` string uses slashes, so
+  a find-and-replace on the dotted package name misses it. The hook then silently did not take,
+  and the hook report caught it ("Not available on this game version: the curved HUD").
+- **Trap:** after switching branch or moving the project folder, delete
+  `.gradle/configuration-cache` if a build finishes suspiciously fast and produces no new jar.
+
+Checked with the visual test, mod alone, run on the build machine's Java 25. Not yet checked on
+a Java 21 runtime or with other mods on 1.21.11.
+
 ## Releasing
 
 1. Merge or tag on the version's branch; CI (`.github/workflows/build.yml`) builds the jar on

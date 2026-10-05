@@ -3,22 +3,22 @@ package io.github.irfanadli97.tvomf.mixin;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.Hud;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.Gui;
 import io.github.irfanadli97.tvomf.HookStatus;
 import io.github.irfanadli97.tvomf.HudSway;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(Hud.class)
+@Mixin(Gui.class)
 public abstract class HudMixin {
 	@Unique
-	private GuiGraphicsExtractor tvomf$graphics;
+	private GuiGraphics tvomf$graphics;
 
 	// Wrapping the whole method, rather than injecting at HEAD and TAIL like the original,
 	// keeps the push and pop paired even if something inside returns early or throws.
-	@WrapMethod(method = "extractRenderState")
-	private void tvomf$swayHud(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
+	@WrapMethod(method = "render")
+	private void tvomf$swayHud(GuiGraphics graphics, DeltaTracker deltaTracker, Operation<Void> original) {
 		HookStatus.swayHudRan = true;
 		HudSway.update(deltaTracker);
 		tvomf$graphics = graphics;
@@ -28,10 +28,10 @@ public abstract class HudMixin {
 	// During normal play the subtitles are not drawn inside extractRenderState: the Hud stores a
 	// task and Gui runs it later through this method. Fabric API draws every element registered
 	// after the subtitles (which is where addLast puts modded elements) in that same task.
-	@WrapMethod(method = "extractDeferredSubtitles")
+	@WrapMethod(method = "renderDeferredSubtitles")
 	private void tvomf$swayDeferredSubtitles(Operation<Void> original) {
 		HookStatus.swayDeferredSubtitlesRan = true;
-		GuiGraphicsExtractor graphics = tvomf$graphics;
+		GuiGraphics graphics = tvomf$graphics;
 		tvomf$graphics = null;
 
 		if (graphics == null) {

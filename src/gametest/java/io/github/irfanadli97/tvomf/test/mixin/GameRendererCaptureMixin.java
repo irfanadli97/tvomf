@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /** Test-only: gives {@link FrameCapture} a call before and after every rendered frame. */
 @Mixin(GameRenderer.class)
 public abstract class GameRendererCaptureMixin {
-	@Inject(method = "extract", at = @At("HEAD"))
+	@Inject(method = "render", at = @At("HEAD"))
 	private void tvomftest$beforeFrame(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
 		FrameCapture.beforeFrame();
 	}
