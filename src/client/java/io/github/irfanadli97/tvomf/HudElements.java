@@ -99,6 +99,23 @@ public final class HudElements {
 	private record Wrapper(Identifier id, HudElement original) implements HudElement {
 		@Override
 		public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+			if (!FULL_SCREEN.contains(id)) {
+				draw(graphics, deltaTracker);
+				return;
+			}
+
+			// A full-screen overlay is made of several pieces (the spyglass is a scope and four
+			// black bars); bending or scaling any of them opens gaps onto the world.
+			HudCurve.beginFlat();
+
+			try {
+				draw(graphics, deltaTracker);
+			} finally {
+				HudCurve.endFlat();
+			}
+		}
+
+		private void draw(GuiGraphics graphics, DeltaTracker deltaTracker) {
 			MotionHudConfig config = MotionHudConfig.get();
 			float x = 0;
 			float y = 0;

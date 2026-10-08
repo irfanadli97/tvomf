@@ -59,12 +59,15 @@ public class HudVisualTest implements FabricClientGameTest {
 				MotionHudConfig config = MotionHudConfig.get();
 				config.curveEnabled = true;
 				config.curveStrength = 100;
+				config.curveShape = MotionHudConfig.SHAPE_CYLINDER;
 				HudSway.setTestOffset(24, 16);
 			});
 			context.waitTicks(10);
 			context.getInput().holdMouse(1);
-			context.waitTicks(2);
-			context.takeScreenshot("4f0_spyglass_opening_curved_swayed");
+			context.takeScreenshot("4f0a_spyglass_opening");
+			context.takeScreenshot("4f0b_spyglass_opening");
+			context.takeScreenshot("4f0c_spyglass_opening");
+			context.runOnClient(minecraft -> MotionHudConfig.get().curveShape = MotionHudConfig.SHAPE_SPHERE);
 			context.waitTicks(30);
 			shot(context, "4f_spyglass_flat_rest", 0, 0, false);
 			shot(context, "4g_spyglass_curved_swayed", 24, 16, true);
