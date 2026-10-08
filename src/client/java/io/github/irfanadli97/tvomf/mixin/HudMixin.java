@@ -6,6 +6,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
 import io.github.irfanadli97.tvomf.HookStatus;
+import io.github.irfanadli97.tvomf.HudCurve;
 import io.github.irfanadli97.tvomf.HudSway;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,6 +24,19 @@ public abstract class HudMixin {
 		HudSway.update(deltaTracker);
 		tvomf$graphics = graphics;
 		HudSway.applyTo(graphics, () -> original.call(graphics, deltaTracker));
+	}
+
+	// The debug screen is drawn by the game outside the method above, so it never sways, but it
+	// shares the GUI mesh and would bend. Dense small text is easier to read flat.
+	@WrapMethod(method = "extractDebugOverlay")
+	private void tvomf$keepDebugFlat(GuiGraphicsExtractor graphics, Operation<Void> original) {
+		HudCurve.beginFlat();
+
+		try {
+			original.call(graphics);
+		} finally {
+			HudCurve.endFlat();
+		}
 	}
 
 	// During normal play the subtitles are not drawn inside extractRenderState: the Hud stores a
