@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -47,6 +48,39 @@ public class HudVisualTest implements FabricClientGameTest {
 			shot(context, "4d_sneak_flat_swayed_off_screen", -60, -60, false);
 			shot(context, "4e_sneak_curved_swayed_off_screen", -60, -60, true);
 			context.getInput().releaseKey(options -> options.keyShift);
+
+			// The spyglass view is a scope texture with black bars round it. None of it may sway
+			// or bend, or the world shows through at the screen edges and between the pieces.
+			singleplayer.getServer().runCommand("item replace entity @a weapon.mainhand with minecraft:spyglass");
+			context.waitTicks(10);
+			// The scope grows from half size for the first few ticks; catch it part-way, with the
+			// curve already on.
+			context.runOnClient(minecraft -> {
+				MotionHudConfig config = MotionHudConfig.get();
+				config.curveEnabled = true;
+				config.curveStrength = 100;
+				HudSway.setTestOffset(24, 16);
+			});
+			context.waitTicks(10);
+			context.getInput().holdMouse(1);
+			context.waitTicks(2);
+			context.takeScreenshot("4f0_spyglass_opening_curved_swayed");
+			context.waitTicks(30);
+			shot(context, "4f_spyglass_flat_rest", 0, 0, false);
+			shot(context, "4g_spyglass_curved_swayed", 24, 16, true);
+			context.runOnClient(minecraft -> MotionHudConfig.get().curveShape = MotionHudConfig.SHAPE_CYLINDER);
+			shot(context, "4h_spyglass_cylinder_swayed", 24, 16, true);
+			context.runOnClient(minecraft -> MotionHudConfig.get().curveShape = MotionHudConfig.SHAPE_SPHERE);
+			context.getInput().releaseMouse(1);
+			singleplayer.getServer().runCommand("item replace entity @a weapon.mainhand with minecraft:air");
+			context.waitTicks(10);
+
+			// The debug screen stays flat and still while the HUD under it is curved and swayed.
+			context.getInput().pressKey(InputConstants.KEY_F3);
+			context.waitTicks(5);
+			shot(context, "4i_debug_screen_curved_swayed", 24, 16, true);
+			context.getInput().pressKey(InputConstants.KEY_F3);
+			context.waitTicks(5);
 
 			busyHud(context, singleplayer);
 			traceMotion(context, singleplayer);
