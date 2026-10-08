@@ -44,6 +44,8 @@ public final class HookStatus implements IMixinConfigPlugin {
 	static {
 		expect("GuiRendererMixin", "beginFrame", "the curved HUD and sprint zoom");
 		expect("GuiRendererMixin", "curveScissor", "clipping of curved or swayed elements");
+		expect("GuiRenderStateMixin", "keepFlat", "the debug screen and full-screen overlays staying flat under the curve");
+		expect("GuiRenderStateMixin", "keepTextFlat", "the debug screen and full-screen overlays staying flat under the curve");
 		expect("GuiRenderStateMixin", "recordShift", "sway for 3D models on the HUD");
 		expect("GuiRenderStateMixin", "shiftModel", "sway for 3D models on the HUD");
 		expect("PictureInPictureRendererMixin", "beginPlacing", "sway for 3D models on the HUD");

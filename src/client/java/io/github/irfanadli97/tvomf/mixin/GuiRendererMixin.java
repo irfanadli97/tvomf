@@ -36,7 +36,7 @@ public abstract class GuiRendererMixin {
 	private void tvomf$curve(GuiElementRenderState element, VertexConsumer consumer, Operation<Void> original) {
 		HookStatus.curveRan = true;
 
-		if (HudCurve.appliesTo(element.bounds())) {
+		if (HudCurve.appliesTo(element)) {
 			HudCurve.build(element, consumer, curved -> original.call(element, curved));
 		} else {
 			original.call(element, consumer);

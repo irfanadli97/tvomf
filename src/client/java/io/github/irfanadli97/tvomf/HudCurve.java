@@ -1,5 +1,7 @@
 package io.github.irfanadli97.tvomf;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -9,6 +11,7 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.renderer.state.gui.GlyphRenderState;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -41,6 +44,13 @@ public final class HudCurve {
 	private static final int MAX_CELLS = 64;
 
 	private static final Curved CURVED = new Curved();
+
+	// Things that must stay flat whatever their size: the debug screen and the full-screen
+	// overlays. They are noted while the frame is being recorded and looked up when its mesh is
+	// built, so there is one set being filled and one being read.
+	private static Set<Object> flatRecording = Collections.newSetFromMap(new IdentityHashMap<>());
+	private static Set<Object> flat = Collections.newSetFromMap(new IdentityHashMap<>());
+	private static int flatDepth;
 	private static @Nullable Set<String> extraDataUsers;
 	private static float fade;
 	/** The strength in use this frame, 0-100, easing towards the normal or the sprinting setting. */
@@ -64,6 +74,11 @@ public final class HudCurve {
 
 	/** Called once per frame before the GUI mesh is built. */
 	public static void beginFrame() {
+		Set<Object> read = flat;
+		flat = flatRecording;
+		flatRecording = read;
+		flatRecording.clear();
+
 		Minecraft minecraft = Minecraft.getInstance();
 		MotionHudConfig config = MotionHudConfig.get();
 		boolean wanted = minecraft.player != null && minecraft.gui.screen() == null;
@@ -123,10 +138,18 @@ public final class HudCurve {
 	 * pulling it inwards would uncover the screen edge. So is a small element on the exact centre,
 	 * which would only shrink by a fraction of a pixel and turn blurry.
 	 */
-	public static boolean appliesTo(@Nullable ScreenRectangle bounds) {
-		if (!active()) {
+	public static boolean appliesTo(GuiElementRenderState element) {
+		if (!active() || flat.contains(element)) {
 			return false;
 		}
+
+		// Text is recorded as a whole and only split into glyphs later; the glyphs share the
+		// text's pose object, which is what was noted for it.
+		if (element instanceof GlyphRenderState glyph && flat.contains(glyph.pose())) {
+			return false;
+		}
+
+		ScreenRectangle bounds = element.bounds();
 
 		if (bounds == null) {
 			return true;
@@ -138,6 +161,27 @@ public final class HudCurve {
 
 		boolean onCenter = bounds.left() <= centerX && bounds.right() >= centerX && bounds.top() <= centerY && bounds.bottom() >= centerY;
 		return !(onCenter && bounds.width() <= CENTER_ELEMENT_SIZE && bounds.height() <= CENTER_ELEMENT_SIZE);
+	}
+
+	/** Everything recorded until the matching {@link #endFlat()} is left unbent and unscaled. */
+	public static void beginFlat() {
+		flatDepth++;
+	}
+
+	public static void endFlat() {
+		flatDepth--;
+	}
+
+	/** Notes {@code key} (an element, or a text's pose) if it is being recorded inside a flat section. */
+	public static void recordFlat(Object key) {
+		if (flatDepth > 0) {
+			// Only reachable if the per-frame swap in beginFrame has stopped running.
+			if (flatRecording.size() > 8192) {
+				flatRecording.clear();
+			}
+
+			flatRecording.add(key);
+		}
 	}
 
 	/** Builds the element's vertices into {@code consumer}, bent. */
