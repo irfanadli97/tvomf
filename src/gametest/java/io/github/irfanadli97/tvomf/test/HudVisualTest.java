@@ -25,7 +25,7 @@ import io.github.irfanadli97.tvomf.MotionHudConfig;
 public class HudVisualTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
-		if (MediaShoot.requested()) {
+		if (MediaShoot.requested() || ConfigTest.requested()) {
 			return;
 		}
 

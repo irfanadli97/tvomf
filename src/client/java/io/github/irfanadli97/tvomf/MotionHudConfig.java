@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -15,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,6 +41,9 @@ public final class MotionHudConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve(MotionHudClient.MOD_ID + ".json");
 	private static final Path OLD_PATH = FabricLoader.getInstance().getConfigDir().resolve("gd656motionhud.json");
+	private static final Path BROKEN_PATH = FabricLoader.getInstance().getConfigDir().resolve(MotionHudClient.MOD_ID + ".json.broken");
+	/** The settings screen's limit for a pixel offset. */
+	private static final float MAX_OFFSET_PIXELS = 4000.0f;
 	private static MotionHudConfig instance = new MotionHudConfig();
 
 	/** Master switch for the sway. Per-element offsets still apply when this is off. */
@@ -102,15 +107,21 @@ public final class MotionHudConfig {
 		Path source = migrating ? OLD_PATH : PATH;
 
 		if (Files.exists(source)) {
+			// Anything at all can be wrong with a hand-edited file, and Gson does not report every
+			// kind of mistake the same way (text where a number belongs is a NumberFormatException),
+			// so every failure is treated alike: never let it stop the game from starting.
 			try (Reader reader = Files.newBufferedReader(source, StandardCharsets.UTF_8)) {
 				loaded = GSON.fromJson(reader, MotionHudConfig.class);
-			} catch (IOException | JsonParseException e) {
-				MotionHudClient.LOGGER.error("Could not read {}, using defaults", source, e);
+			} catch (IOException | RuntimeException e) {
+				MotionHudClient.LOGGER.error("Could not read {} ({}); using the default settings. The file as it was is kept as {}",
+						source.getFileName(), e.getMessage(), BROKEN_PATH.getFileName());
+				keepUnreadable(source);
 			}
 		}
 
 		instance = loaded != null ? loaded : new MotionHudConfig();
 		instance.sanitize();
+		HudElements.reportUnknownOffsets();
 
 		if (loaded == null || migrating) {
 			instance.save();
@@ -167,24 +178,74 @@ public final class MotionHudConfig {
 	}
 
 	private void sanitize() {
-		if (!Float.isFinite(maxOffset) || maxOffset < 0) maxOffset = DEFAULT_MAX_OFFSET;
-		if (!Float.isFinite(damping)) damping = DEFAULT_DAMPING;
-		if (!Float.isFinite(sensitivity)) sensitivity = DEFAULT_SENSITIVITY;
-		if (!Float.isFinite(motionSensitivity)) motionSensitivity = DEFAULT_MOTION_SENSITIVITY;
-		if (!Float.isFinite(curveStrength)) curveStrength = DEFAULT_CURVE_STRENGTH;
-		if (!SHAPE_CYLINDER.equals(curveShape)) curveShape = SHAPE_SPHERE;
-		if (!Float.isFinite(sprintCurveStrength)) sprintCurveStrength = DEFAULT_SPRINT_CURVE_STRENGTH;
-		if (!Float.isFinite(sprintCurveTransition) || sprintCurveTransition < 0) sprintCurveTransition = DEFAULT_SPRINT_CURVE_TRANSITION;
-		if (!Float.isFinite(sprintZoom) || sprintZoom < 0) sprintZoom = DEFAULT_SPRINT_ZOOM;
-		if (!Float.isFinite(bobStrength)) bobStrength = DEFAULT_BOB_STRENGTH;
-		if (!Float.isFinite(sprintBobStrength)) sprintBobStrength = DEFAULT_SPRINT_BOB_STRENGTH;
+		// The same ranges the command and the settings screen enforce; a file edited by hand is
+		// the one way round them.
+		maxOffset = inRange("maxOffset", maxOffset, 0.0f, 50.0f, DEFAULT_MAX_OFFSET);
+		damping = inRange("damping", damping, 0.1f, 1.0f, DEFAULT_DAMPING);
+		sensitivity = inRange("sensitivity", sensitivity, 0.01f, 1.0f, DEFAULT_SENSITIVITY);
+		motionSensitivity = inRange("motionSensitivity", motionSensitivity, 0.0f, 100.0f, DEFAULT_MOTION_SENSITIVITY);
+		curveStrength = inRange("curveStrength", curveStrength, 0.0f, 100.0f, DEFAULT_CURVE_STRENGTH);
+		sprintCurveStrength = inRange("sprintCurveStrength", sprintCurveStrength, 0.0f, 100.0f, DEFAULT_SPRINT_CURVE_STRENGTH);
+		sprintCurveTransition = inRange("sprintCurveTransition", sprintCurveTransition, 0.0f, 10.0f, DEFAULT_SPRINT_CURVE_TRANSITION);
+		sprintZoom = inRange("sprintZoom", sprintZoom, 0.0f, HudCurve.MAX_ZOOM, DEFAULT_SPRINT_ZOOM);
+		bobStrength = inRange("bobStrength", bobStrength, 0.0f, 20.0f, DEFAULT_BOB_STRENGTH);
+		sprintBobStrength = inRange("sprintBobStrength", sprintBobStrength, 0.0f, 20.0f, DEFAULT_SPRINT_BOB_STRENGTH);
+
+		if (!SHAPE_CYLINDER.equals(curveShape) && !SHAPE_SPHERE.equals(curveShape)) {
+			MotionHudClient.LOGGER.warn("curveShape '{}' in {} is neither sphere nor cylinder; using sphere", curveShape, PATH.getFileName());
+			curveShape = SHAPE_SPHERE;
+		}
 
 		if (elements == null) {
 			elements = new TreeMap<>();
 		}
 
 		elements.values().removeIf(offset -> offset == null);
+
+		for (Map.Entry<String, ElementOffset> entry : elements.entrySet()) {
+			ElementOffset offset = entry.getValue();
+			String name = "elements." + entry.getKey();
+			offset.x = inRange(name + ".x", offset.x, -MAX_OFFSET_PIXELS, MAX_OFFSET_PIXELS, 0.0f);
+			offset.y = inRange(name + ".y", offset.y, -MAX_OFFSET_PIXELS, MAX_OFFSET_PIXELS, 0.0f);
+			offset.xPercent = inRange(name + ".xPercent", offset.xPercent, -100.0f, 100.0f, 0.0f);
+			offset.yPercent = inRange(name + ".yPercent", offset.yPercent, -100.0f, 100.0f, 0.0f);
+		}
+
 		resolve();
+	}
+
+	/**
+	 * {@code value} if it is a number within the range; the nearest end of the range if it is
+	 * outside; {@code fallback} if it is not a number at all. Says so in the log when it changes it.
+	 */
+	private static float inRange(String name, float value, float min, float max, float fallback) {
+		float fixed = Float.isNaN(value) ? fallback : Mth.clamp(value, min, max);
+
+		if (fixed != value) {
+			MotionHudClient.LOGGER.warn("{} in {} was {}, outside {} to {}; using {}", name, PATH.getFileName(), value, min, max, fixed);
+		}
+
+		return fixed;
+	}
+
+	private static void keepUnreadable(Path source) {
+		try {
+			Files.copy(source, BROKEN_PATH, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			MotionHudClient.LOGGER.error("Could not keep a copy of {}", source.getFileName(), e);
+		}
+	}
+
+	/**
+	 * Called once the HUD elements are known: an offset for an id no element has does nothing, and
+	 * is most likely a typing mistake.
+	 */
+	public void warnAboutUnknownElements(java.util.Collection<Identifier> known) {
+		for (Identifier id : resolved.keySet()) {
+			if (!known.contains(id)) {
+				MotionHudClient.LOGGER.warn("No HUD element is called '{}'; its offset in {} is ignored. See /{} element list", id, PATH.getFileName(), MotionHudClient.MOD_ID);
+			}
+		}
 	}
 
 	private void resolve() {

@@ -69,6 +69,14 @@ public final class HudElements {
 		}
 
 		MotionHudClient.LOGGER.info("Wrapped {} HUD elements", wrapped.size());
+		reportUnknownOffsets();
+	}
+
+	/** Does nothing until the elements are known, which is once the game has finished starting. */
+	static void reportUnknownOffsets() {
+		if (!wrapped.isEmpty()) {
+			MotionHudConfig.get().warnAboutUnknownElements(wrapped);
+		}
 	}
 
 	private static List<Identifier> discover() {
