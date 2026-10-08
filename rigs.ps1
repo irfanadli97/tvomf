@@ -12,6 +12,9 @@ param(
     [string[]]$Use = @()
 )
 
+# Started with -File, PowerShell hands "A,B" over as one string; accept that as well as a real list.
+$Use = @($Use | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+
 $rigs = [ordered]@{
     # What nearly everyone runs; these change how the game draws.
     'A'      = 'sodium', 'lithium', 'ferrite-core', 'entityculling', 'immediatelyfast', 'modmenu', 'cloth-config'

@@ -81,3 +81,13 @@ jar {
 		rename { "CREDITS_${projectName}.md" }
 	}
 }
+
+// Lets the test client run on another Java than the one Gradle runs on, for example the Java 21
+// most 1.21.x players have: gradlew runClientGameTest -PtestJava=C:\path\to\bin\java.exe
+def testJava = providers.gradleProperty('testJava')
+
+tasks.withType(JavaExec).configureEach {
+	if (testJava.isPresent()) {
+		executable = testJava.get()
+	}
+}
