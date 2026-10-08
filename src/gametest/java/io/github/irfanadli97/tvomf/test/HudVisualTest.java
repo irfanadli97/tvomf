@@ -63,7 +63,7 @@ public class HudVisualTest implements FabricClientGameTest {
 				HudSway.setTestOffset(24, 16);
 			});
 			context.waitTicks(10);
-			context.getInput().holdMouse(1);
+			context.getInput().holdKey(options -> options.keyUse);
 			context.takeScreenshot("4f0a_spyglass_opening");
 			context.takeScreenshot("4f0b_spyglass_opening");
 			context.takeScreenshot("4f0c_spyglass_opening");
@@ -74,7 +74,7 @@ public class HudVisualTest implements FabricClientGameTest {
 			context.runOnClient(minecraft -> MotionHudConfig.get().curveShape = MotionHudConfig.SHAPE_CYLINDER);
 			shot(context, "4h_spyglass_cylinder_swayed", 24, 16, true);
 			context.runOnClient(minecraft -> MotionHudConfig.get().curveShape = MotionHudConfig.SHAPE_SPHERE);
-			context.getInput().releaseMouse(1);
+			context.getInput().releaseKey(options -> options.keyUse);
 			singleplayer.getServer().runCommand("item replace entity @a weapon.mainhand with minecraft:air");
 			context.waitTicks(10);
 
