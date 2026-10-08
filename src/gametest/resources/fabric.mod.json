@@ -7,7 +7,8 @@
 	"entrypoints": {
 		"fabric-client-gametest": [
 			"io.github.irfanadli97.tvomf.test.HudVisualTest",
-			"io.github.irfanadli97.tvomf.test.MediaShoot"
+			"io.github.irfanadli97.tvomf.test.MediaShoot",
+			"io.github.irfanadli97.tvomf.test.ConfigTest"
 		]
 	},
 	"mixins": [
