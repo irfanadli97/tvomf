@@ -23,7 +23,7 @@ jar (version 0.0.5-1.20.1-forge), which its MIT License permits.
 
 ### What is new here
 
-Everything else was written for this project: the rewrite for Minecraft 26.2 and Fabric, the
+Everything else was written for this project: the rewrite for Fabric on Minecraft 26.2, and the builds for 26.3 and 1.21.11 that followed, the
 frame-rate independent sway and soft limit, vertical sway from jumping and falling, walking bob,
 the curved HUD (sphere and cylinder), the sprint curve and zoom-out, per-element offsets, sway for
 3D models on the HUD, the settings screen, and the visual test rig.
