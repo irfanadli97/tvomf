@@ -145,7 +145,7 @@ gets the full list again.
 | Scripted hook report | A hook that silently missed after a port |
 | Hand play, with a screenshot taken mid-motion | Seams in the spyglass view while it opened |
 | Hand play | The debug screen bending when it should not |
-| Hand play, one item at a time | Nothing, across window and GUI-scale changes, frame-rate caps, every toggle and command, and fourteen of the other mods one by one |
+| Hand play, one item at a time | Nothing, across window and GUI-scale changes, frame-rate caps, every toggle and command, and eleven of the other mods one by one |
 
 So: scripts catch what has a right answer, hands catch what only shows in motion, and going
 through other mods one at a time was the slowest part and found the least. One pass is a small
