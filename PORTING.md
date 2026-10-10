@@ -15,10 +15,14 @@ it should turn a port into a checklist.
    is reported there as `Could not hook ...`, and once more in chat after five seconds in a world.
 5. Look at the screenshots in `build/run/clientGameTest/screenshots` and at `sway_trace.csv`
    (see "Checking a port").
-6. Repeat with other mods' jars in `build/run/clientGameTest/mods`.
+6. Repeat with other mods: `rigs.ps1 -GameVersion <version> -Download` fetches small test sets into
+   `rigs/`, and `run-rig-tests.ps1` runs the visual test once per set.
+7. `run-config-test.ps1` for the settings file, then [BETA-CHECKLIST.md](BETA-CHECKLIST.md) for what
+   still needs a person.
 
 `gradlew clean` deletes `build/`, and with it the test client's `mods` folder, worlds and
-settings. Copy the jars back afterwards.
+settings. That is why the test sets are kept in `rigs/`, outside `build/`; refill the test
+client from there with `rigs.ps1 -Use`.
 
 ## How the mod is put together
 
@@ -51,6 +55,8 @@ Names are Mojang's own (26.x is not obfuscated). If one of these moved, this is 
 | `GuiRenderStateMixin` | `GuiRenderState.addPicturesInPictureState` | `@Inject` HEAD | Notes the sway in force when a 3D model is recorded. |
 | `GuiRenderStateMixin` | `GuiRenderState.addBlitToCurrentLayer(BlitRenderState)` | `@ModifyVariable` | Shifts the quad a model's texture is drawn with. |
 | `PictureInPictureRendererMixin` | `PictureInPictureRenderer.prepare` | `@Inject` HEAD and RETURN | Marks which model the next such quad belongs to. |
+| `GuiRenderStateMixin` | `GuiRenderState.addGuiElement` and `addText` | `@Inject` HEAD | Notes elements and text recorded inside a "keep flat" section. |
+| `HudMixin` | `Hud.extractDebugOverlay(GuiGraphicsExtractor)` | `@WrapMethod` | Makes the F3 debug screen one such section. The game draws it outside `extractRenderState`, so it never sways, but it shares the GUI mesh and would bend. |
 
 Every hook is optional (`"required": false`, `defaultRequire: 0`). A hook that fails switches its
 feature off; it does not stop the game.
@@ -93,6 +99,12 @@ feature off; it does not stop the game.
   rate; do not replace it with "add then decay".
 - **Screens.** Screens share the GUI mesh with the HUD, so the bend fades out while any screen is
   open. Models recorded by screens are recorded with no sway in force and are left alone.
+- **Things that must stay flat are marked, not measured.** A full-screen overlay is several
+  pieces (the spyglass is a scope texture and four black bars). Deciding piece by piece from its
+  size whether to bend it left seams onto the world while the scope was still growing. The whole
+  overlay, and the F3 screen, are instead recorded inside a "keep flat" section
+  (`HudCurve.beginFlat`); elements are noted by identity, and text by the pose object its glyphs
+  share, since text is only split into glyphs later.
 - **Checking hooks.** Plain `@Inject` and `@ModifyVariable` hooks can be confirmed by looking for
   the handler call in the patched class (`HookStatus.postApply`). MixinExtras hooks
   (`@WrapMethod`, `@WrapOperation`) are woven in after that point, so they set a flag the first
@@ -116,6 +128,23 @@ and with the curve on and off. Look for:
 `make-media.ps1` reshoots the stills and clips for the README once the port is right.
 
 ## Port log
+
+The code on `main` is the 26.2 build. Each other game version has its own branch, `mc/<version>`,
+and a fix is carried between them one branch at a time.
+
+### 26.2 to 26.3 (branch `mc/26.3`)
+
+Every hook still took unchanged. Two compile fixes and one test fix:
+
+- `PrimitiveTopology` moved from `com.mojang.blaze3d` to `com.mojang.renderpearl.api.pipeline`
+  (26.3 moved much of the low-level rendering API into a `renderpearl` package).
+- `VertexConsumer` gained `setUv3(float, float)`. `HudCurve.Curved` stores and blends it like the
+  other values.
+- Test only: `GameRenderer.render` lost its parameters, so the frame-capture hook's handler had
+  to drop them too. A handler whose parameters do not match the target fails the mixin outright;
+  in the mod itself that would switch the feature off, in the test mod it stops the client.
+
+Checked with the visual test, mod alone. Not yet checked with other mods on 26.3.
 
 ### 26.2 back to 1.21.11 (branch `mc/1.21.11`)
 

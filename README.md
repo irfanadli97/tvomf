@@ -2,7 +2,11 @@
 
 # There's a Visor On My Face
 
-**TVOMF** for short. A client-side Fabric mod for Minecraft 26.2.
+> **You are on the `mc/1.21.11` branch**, which holds the beta build for Minecraft 1.21.11. The text
+> below is the same as on the [main branch](https://github.com/irfanadli97/tvomf), which is the
+> build for Minecraft 26.2.
+
+**TVOMF** for short. A client-side Fabric mod for Minecraft 1.21.11, 26.2 and 26.3.
 
 You have been playing Minecraft with your hearts, hotbar and minimap glued flat to the inside of
 your eyeballs. That's weird. This mod puts them where they belong: on a visor, on a helmet, on
@@ -66,15 +70,29 @@ Motion is the point, so stills undersell it, but here is the curve standing stil
 
 ## What it leaves alone
 
-- Full-screen overlays (vignette, pumpkin blur, spyglass, portal, sleep) never move. Your visor is
-  not that dirty.
+- Full-screen overlays (vignette, pumpkin blur, spyglass, portal, powder-snow frost, sleep) never
+  move or bend. Your visor is not that dirty.
+- The F3 debug screen stays flat and straight, so the small print is readable.
 - Menus and inventories stay flat and still, so buttons are where your mouse thinks they are.
 - The crosshair stays the same size, and can be told to stay put entirely.
 
-## Installing
+## Getting it
 
-Needs [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api).
-Drop the jar in your `mods` folder. It is client-side only and works on any server.
+Downloads are on the [releases page](https://github.com/irfanadli97/tvomf/releases). Each jar's
+name ends with the game version it is for; take the newest one for yours.
+
+| Minecraft | Status | Java | How far it has been tested |
+|---|---|---|---|
+| 26.2 | Release | 25 | Scripted tests alone and with a 56-mod set; the author's everyday version |
+| 1.21.11 | Beta | 21 or newer | Passed the full [test checklist](BETA-CHECKLIST.md): scripted and played by hand |
+| 26.3 | Alpha | 25 | Scripted tests with the mod alone; not yet played by hand |
+
+Needs [Fabric Loader](https://fabricmc.net/use/) 0.19.5 or newer and
+[Fabric API](https://modrinth.com/mod/fabric-api). Drop the jar in your `mods` folder and remove any
+older TVOMF jar. It is client-side only and works on any server.
+
+Minecraft 1.21.5 and older draw the HUD in a different way. The sway could be ported there, but
+the curve would have to be written again, so those versions are not supported.
 
 ## Recommended alongside
 
@@ -88,7 +106,20 @@ nicer screen:
 - **[BedrockIfy](https://modrinth.com/mod/bedrockify)**: its screen safe area pushes the whole HUD
   in from the edges, and its paper doll rides the visor too.
 
-Both are optional, and both have been run together with TVOMF.
+Both are optional, and both have been played alongside TVOMF, including clicking chat that Raised
+had moved.
+
+## Plays with
+
+Played by hand alongside TVOMF on 1.21.11, as part of its beta testing: Sodium, Lithium,
+FerriteCore, Entity Culling, ImmediatelyFast, Iris (shaders on and off), Mod Menu, Cloth Config,
+Xaero's Minimap, Jade, AppleSkin, JEI, Simple Voice Chat, BedrockIfy, Raised, Scoreboard Overhaul,
+Chat Animation, Smooth GUI, Inventory Profiles Next and Just Zoom. JourneyMap is covered by
+scripted runs there and by everyday play on 26.2.
+
+That is a list of what has been tried, not a promise about everything else. A mod that draws on
+the HUD in the usual way should sway and curve with the rest; if one does not, or something
+breaks, please open an issue.
 
 ## Settings screen
 
@@ -144,6 +175,11 @@ Positive x is right, positive y is down.
 | `sprintBobStrength` | `5.0` | Height of the bob while sprinting, in GUI pixels (0-20) |
 | `elements` | `{}` | Per-element offsets, e.g. `"minecraft:hotbar": {"x": 0, "y": -10, "xPercent": 0, "yPercent": 0}` |
 
+A settings file edited by hand cannot stop the game from starting. A file that cannot be read is
+kept as `tvomf.json.broken` and replaced with the defaults; a value outside its range is pulled
+to the nearest end of it; an offset for an element id that does not exist is ignored. Each of
+these is noted in the log.
+
 ## Known limits
 
 - Moving the chat does not move where it responds to clicks.
@@ -161,23 +197,29 @@ The jar is written to `build/libs`. Moving to another Minecraft version? Start w
 On a game version the mod was not built for, any part that can no longer hook into the game
 switches itself off and says so once in chat, instead of stopping the game from starting.
 
-## Visual test
+## Testing
 
-`run-visual-test.ps1` starts a client, creates a world and writes to `build/run/clientGameTest`:
+[BETA-CHECKLIST.md](BETA-CHECKLIST.md) is what a build has to pass to be called a beta, with the
+record of every run so far. The scripted half of it lives in this repository:
 
-- `screenshots/`: the HUD flat and curved, at rest and with a fixed sway offset.
-- `sway_trace.csv`: the sway offset frame by frame during a long fall; it should change smoothly.
+- `run-visual-test.ps1` starts a client, creates a world and writes screenshots of the HUD flat
+  and curved, at rest and swayed, with the spyglass, the F3 screen and a busy HUD, plus
+  `sway_trace.csv`, the sway frame by frame during a long fall. Output goes to
+  `build/run/clientGameTest`.
+- `rigs.ps1` downloads small sets of other mods for a game version into `rigs/` and switches the
+  test client between them; `run-rig-tests.ps1` runs the visual test once per set.
+- `run-config-test.ps1` runs 27 checks on missing, renamed, cut-off, out-of-range and mistyped
+  settings files.
 
-To include another mod's HUD in the screenshots, copy its jar into `build/run/clientGameTest/mods`
-first.
+Add `-PtestJava=<path to java.exe>` to a Gradle run to test on another Java.
 
 ## Page media
 
 `make-media.ps1 -ModSet solo` (or `full`) shoots the stills and the two five second clips in
 `docs/media` from a scripted run in the test client: 1600x900, the same camera path every time.
 Add `-SettingsFile path\to\tvomf.json` to shoot with your own settings instead of the defaults.
-It needs ffmpeg on the PATH. For `full`, put the other mods' jars in
-`build/run/clientGameTest/mods-full`.
+It needs ffmpeg on the PATH. For `full`, fill the test client's `mods` folder first, for example
+with `rigs.ps1 -Use`.
 
 ## Credits and licence
 
