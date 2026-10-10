@@ -356,3 +356,24 @@ Notes that qualify the record, none of them blocking:
 - All hand play was on Java 25. Java 21 is covered by scripted runs only.
 - The beta jar is the alpha.4 code with the version label changed to beta.1.
 - `tvomf-0.1.1-beta.1+1.21.11-fabric.jar` (SHA-256 DC84D2E7460EE1EBC253A85E782573C7CFF2FE406FA0B61AF85959067AE673A4) built from the same code; the scripted visual test and the 27 settings-file checks were rerun on it and pass. Not yet released.
+
+### Short form, block C, 2026-10-10 (26.2, 0.1.3)
+
+```
+Build:      tvomf-0.1.3+26.2-fabric.jar   SHA-256 CDCF6F31B60AD28241459549F325B488C9D062B6E793F8AF8FAE2A2D92086FC4
+Game:       Minecraft 26.2, Fabric Loader 0.19.5, the tester's everyday instance (about 56 mods)
+Tester:     irfanadli97 (ordinary play), log read by Claude
+Session:    2 h 5 min in one launch (21:41:03 to 23:46:24), online, one connection, no disconnect
+Result:     block C pass. Blocks A and B not yet run for this version.
+```
+
+- Start-up: 35 HUD elements wrapped, no "Not available" line, so every hook attached.
+- 47 error lines, all in the first three minutes and none from the mod: tags the server sends
+  that 26.2 does not know, and Realms and profile-key 401s. No error or exception after 21:43:46.
+- No stack trace names `tvomf`; no crash report.
+- One warning names the mod, once (21:43:12): `HudCurve$Curved does not support optimized vertex
+  writing code paths, which may cause reduced rendering performance`. A rendering mod falls back
+  to its slower path for the curved HUD's vertices. Speed only; not measured.
+- A shader pack was loaded or reloaded three times during the session.
+- Tester's observation at the end: the HUD rested where it did at the start, the sway was as
+  smooth, and the frame rate had not sagged.
