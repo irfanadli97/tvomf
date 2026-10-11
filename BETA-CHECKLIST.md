@@ -405,3 +405,18 @@ Result:     block A pass. Block B (the hand sitting) not yet run for this versio
 - `run-config-test.ps1`: 27 of 27 pass, with the 56 mods loaded.
 - Oldest Java: 26.2 runs on Java 25 only, which is what the tests use, so there is no second run.
 - Results are kept in `build\rig-results\26.2\` (not in git).
+### Short form, block B, 2026-10-11 (26.2, 0.1.3), by hand
+
+```
+Build:      tvomf-0.1.3+26.2-fabric.jar   SHA-256 CDCF6F31B60AD28241459549F325B488C9D062B6E793F8AF8FAE2A2D92086FC4
+Game:       Minecraft 26.2, the tester's everyday instance (about 56 mods)
+Tester:     irfanadli97 (hand play), log read by Claude
+Result:     all 12 items reported green. With blocks A and C, 0.1.3 has passed the short form.
+```
+
+- Log of the sitting: 12:19:45 to 12:28:00, 35 HUD elements wrapped, no `Not available`, no
+  crash signs, no stack trace naming the mod. Shaders were switched five times.
+- The sitting took about eight minutes, not the forty the list allows for. The curve stood at
+  100 for sixteen seconds (cylinder, then sphere); the spyglass, overlay and F3 items were
+  therefore seen at the tester's own strength of 9, which the list does not forbid.
+- Settings screen: 9.37 was set by command and still read 9.37 in the list afterwards.
