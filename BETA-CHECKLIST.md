@@ -377,3 +377,31 @@ Result:     block C pass. Blocks A and B not yet run for this version.
 - A shader pack was loaded or reloaded three times during the session.
 - Tester's observation at the end: the HUD rested where it did at the start, the sway was as
   smooth, and the frame rate had not sagged.
+### Short form, block A, 2026-10-11 (26.2, 0.1.3), scripted
+
+```
+Build:      main at 7581178 (the code of tvomf-0.1.3+26.2-fabric.jar)
+Game:       Minecraft 26.2, Fabric Loader 0.19.5, Java 25, test client at 854x480
+Tester:     scripted runs by the test client, screenshots read by Claude
+Result:     block A pass. Block B (the hand sitting) not yet run for this version.
+```
+
+- Section 1: `gradlew build` passes from a fresh clone of the GitHub repo; the Actions build for
+  `main` is green on the same commit. Mod alone: 23 HUD elements wrapped, no `Could not hook`,
+  no `Not available`. With one hook broken on purpose (`addPicturesInPictureState` renamed in
+  `GuiRenderStateMixin`) the game started and finished the visual test, the log said
+  `turned off: sway for 3D models on the HUD`, and chat reported it once. Hook restored.
+- Section 2, mod alone: the visual test finished with all 23 screenshots and no crash signs.
+  Sway and curve move the HUD as one, the spyglass opening frames have no gaps, F3 is flat, the
+  busy and finely split shots are legible, and the client survived the off-screen sway shots.
+  `sway_trace.csv` is smooth (largest step 0.27 px, no reversals); the trace is one long fall
+  and ends before landing, so it does not show the return towards zero.
+  `make-media.ps1 -ModSet solo` finished: two clips of 150 frames at 30 fps, 1600x900. Frame
+  counts were checked; nobody watched the clips.
+- Rigs: 26.2 has one rig, `full` (the tester's 56 mods). The visual test finished with all 23
+  screenshots, 35 HUD elements wrapped, no crash signs, no stack trace naming the mod. The one
+  line naming it is Sodium's note that `HudCurve$Curved` uses its slower vertex path.
+  `run-rig-tests.ps1` only knows rigs A, B and C, so this was run by hand with `rigs.ps1 -Use full`.
+- `run-config-test.ps1`: 27 of 27 pass, with the 56 mods loaded.
+- Oldest Java: 26.2 runs on Java 25 only, which is what the tests use, so there is no second run.
+- Results are kept in `build\rig-results\26.2\` (not in git).
